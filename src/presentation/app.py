@@ -1,8 +1,9 @@
 from textual.app import App, ComposeResult
 from textual.containers import Vertical, Center, Horizontal, Middle
-from textual.widgets import Button, Label ,Input
+from textual.widgets import Button, Label, Input
 from textual.screen import Screen
-# import infrastructure.database
+from src.infrastructure.database import UniversityDB
+import uuid
 
 
 
@@ -54,6 +55,22 @@ class RegistrationScreen(BaseScreen):
         super().on_button_pressed(event)
         if event.button.id == "back":
             self.app.pop_screen()
+        elif event.button.id == "register":
+            name = self.query_one("#input", Input).value
+            if name:
+                db = self.app.db
+                # Using a UUID as custom_id like in the student_portal logic
+                user_id = str(uuid.uuid4())
+                result = db.register_user(name, 'student', user_id)
+                if result:
+                    subtitle = self.query_one("#screen-subtitle", Label)
+                    subtitle.update(f"Your ID is: {user_id}")
+                    subtitle.remove_class("error")
+                    subtitle.add_class("success")
+                else:
+                    subtitle = self.query_one("#screen-subtitle", Label)
+                    subtitle.update("Error: Registration failed!")
+                    subtitle.add_class("error")
 
 class LoginScreen(BaseScreen):
     # Screen for current user login.
@@ -66,22 +83,20 @@ class LoginScreen(BaseScreen):
                 yield Button("Login", id="login", variant="primary")
                 yield Button("Back to Welcome", id="back", variant="error")
 
-    def verified_or_not(self, user_id: str) -> bool:
-        """Verifies the user ID."""
-        # Check if the ID consists only of digits and is not empty
-        return user_id.strip().isdigit()
-
     def on_button_pressed(self, event: Button.Pressed) -> None:
         super().on_button_pressed(event)
         if event.button.id == "back":
             self.app.pop_screen()
         elif event.button.id == "login":
             user_input = self.query_one("#input", Input).value
-            if self.verified_or_not(user_input):
+            db = self.app.db
+            user = db.get_user_by_id(user_input)
+            
+            if user and user[3] == 'student':
                  self.app.push_screen(Dashboard())
             else:
                  subtitle = self.query_one("#screen-subtitle", Label)
-                 subtitle.update("Error: ID must consist only of numbers!")
+                 subtitle.update("Error: Invalid ID or Access Denied!")
                  subtitle.remove_class("success")
                  subtitle.add_class("error")
 
@@ -108,6 +123,10 @@ class StudentManagerApp(App):
 
     TITLE = "Student Manager Tool"
     
+    def on_mount(self) -> None:
+        self.db = UniversityDB()
+        self.push_screen(WelcomePage())
+
     CSS = """
     Screen {
         align: center middle;
@@ -191,9 +210,6 @@ class StudentManagerApp(App):
         color: $error;
     }
     """
-
-    def on_mount(self) -> None:
-        self.push_screen(WelcomePage())
 
 if __name__ == "__main__":
     app = StudentManagerApp()
