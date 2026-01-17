@@ -1,5 +1,5 @@
 from src.presentation.app import StudentManagerApp
-
+import sys
 
 def main() -> None:
     """
@@ -8,8 +8,10 @@ def main() -> None:
     This entry point initializes the presentation layer which, in turn,
     wires up the infrastructure and domain use cases.
     """
-    app = StudentManagerApp()
-    app.run()
 
+    if "--tui" in sys.argv:
+        app = StudentManagerApp()
+        app.run()
+ 
 if __name__ == "__main__":
     main()
