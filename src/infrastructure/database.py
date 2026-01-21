@@ -1,4 +1,3 @@
-# database.py
 import sqlite3
 import os
 
@@ -45,7 +44,6 @@ class UniversityDB:
             )
         ''')
 
-        # Essential indexes only
         self.conn.execute("CREATE INDEX IF NOT EXISTS idx_users_custom_id ON users(custom_id)")
         self.conn.execute("CREATE INDEX IF NOT EXISTS idx_enrollments_user ON enrollments(user_uuid)")
 
