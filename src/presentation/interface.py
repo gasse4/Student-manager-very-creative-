@@ -21,11 +21,11 @@ def student_portal(user_repo, course_repo, enrollment_repo):
                 input("Access Denied. Custom ID not found.")
         
         elif choice == '2':
-            name = input("Enter Student Full Name: ")
-            custom_id = str(uuid.uuid4())[:8].upper()
+            name = input("Enter Student Full Name: ").strip()
+            custom_id = bytes(uuid.uuid4())[:8].upper()
             result = user_repo.register_user(name, 'student', custom_id)
             if result:
-                input(f"\n[+] Success! Your Custom ID is: {result}\nPress Enter...")
+                input(f"\n[+] Success! Your Custom ID is: {custom_id}\nPress Enter...")
             else:
                 input("\n[!] Registration failed.")
         
@@ -43,7 +43,7 @@ def student_session(user, user_repo, course_repo, enrollment_repo):
     
     while True:
         clear_screen()
-        print(f"STUDENT: {u_name} | UUID: {u_cid}")
+        print(f"STUDENT: {u_name} | ID: {u_cid}")
         print("-" * 50)
         print(f"1. Enroll (Max 8)\n2. My Courses\n3. Update Course ({update_count}/3 Used)\n4. Logout")
         act = input("\nChoice: ")
@@ -59,10 +59,11 @@ def student_session(user, user_repo, course_repo, enrollment_repo):
                 input("No courses available.")
                 continue
             
+            print("Available Courses:")
             for c in all_courses:
                 print(f"[{c[0]}] {c[1]}")
             
-            target = input("Enter Course Code: ")
+            target = input("Enter Course Code: ").strip()
             success = enrollment_repo.enroll_student(u_uuid, target)
             if success:
                 input("Enrolled successfully!")
@@ -89,21 +90,17 @@ def student_session(user, user_repo, course_repo, enrollment_repo):
                 input("You are not enrolled in any courses to update.")
                 continue
             
-            courses_str = ""
-            for c in course_codes:
-                courses_str = courses_str + c[0] + ", "
-            print("Your Courses:", courses_str)
-            old_code = input("Enter code of course to REMOVE: ")
-            new_code = input("Enter code of NEW course: ")
+            enrolled_list = ", ".join(c[0] for c in course_codes)
+            print(f"Your Courses: {enrolled_list}")
+            old_code = input("Enter code of course to REMOVE: ").strip()
+            new_code = input("Enter code of NEW course: ").strip()
             
-            remove_success = enrollment_repo.remove_enrollment(u_uuid, old_code)
-            enroll_success = enrollment_repo.enroll_student(u_uuid, new_code)
-            
-            if remove_success and enroll_success:
+            success = enrollment_repo.swap_enrollment(u_uuid, old_code, new_code)
+            if success:
                 update_count += 1
                 input(f"Success! Update {update_count}/3 completed.")
             else:
-                input("Error: Update failed. Check course codes.")
+                input("Error: Update failed. Check course codes (must exist and not duplicate).")
         
         elif act == '4':
             break
@@ -133,13 +130,13 @@ def admin_portal(user_repo, course_repo, enrollment_repo, admin_str):
                 input("Error: Limit reached. Admin can only register 10 courses max.")
                 continue
             
-            code = input("Course Code: ")
-            name = input("Course Name: ")
+            code = input("Course Code: ").strip()
+            name = input("Course Name: ").strip()
             success = course_repo.add_course(code, name)
             if success:
                 input("Course Added.")
             else:
-                input("Error: Code exists.")
+                input("Error: Code exists or invalid.")
         
         elif choice == '2':
             roster = enrollment_repo.get_global_roster()
@@ -152,13 +149,13 @@ def admin_portal(user_repo, course_repo, enrollment_repo, admin_str):
             input("Back...")
         
         elif choice == '3':
-            new_s = input("Enter New Hard Admin String: ")
+            new_s = input("Enter New Hard Admin String: ").strip()
             if not is_admin_string_hard(new_s):
                 input("Error: String is too weak!")
                 continue
             result = user_repo.register_user(new_s, 'admin', new_s)
             if result:
-                input(f"Success! New admin registered.")
+                input("Success! New admin registered.")
             else:
                 input("Error: Already exists.")
         
