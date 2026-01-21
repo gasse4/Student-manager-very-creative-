@@ -8,9 +8,10 @@ from src.infrastructure.utils import is_admin_string_hard
 import uuid
 import sys
 
+
 class BaseScreen(Screen):
     # Base screen.
-    
+
     def compose(self) -> ComposeResult:
         with Horizontal(id="app-header"):
             yield Label("Student Manager", id="app-title")
@@ -26,7 +27,6 @@ class BaseScreen(Screen):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "exit-btn":
             self.app.exit()
-
 
 
 class UpdateCourseScreen(BaseScreen):
@@ -173,7 +173,6 @@ class ScheduleScreen(BaseScreen):
                 self.notify("Please select a course to update.", severity="warning")
 
 
-
 class EnrollmentScreen(BaseScreen):
     # Screen for browsing and enrolling in new courses.
     def __init__(self, user):
@@ -238,7 +237,6 @@ class EnrollmentScreen(BaseScreen):
                 self.notify("Please select a course from the table first.", severity="warning")
 
 
-
 class Dashboard(BaseScreen):
     # Simple menu-based dashboard.
     def __init__(self, user):
@@ -264,7 +262,6 @@ class Dashboard(BaseScreen):
             self.app.push_screen(EnrollmentScreen(self.user))
         elif event.button.id == "logout":
             self.app.pop_screen()
-
 
 
 class RegistrationScreen(BaseScreen):
@@ -300,7 +297,6 @@ class RegistrationScreen(BaseScreen):
                     subtitle.add_class("error")
 
 
-
 class LoginScreen(BaseScreen):
     # Screen for current user login.
     def compose_content(self) -> ComposeResult:
@@ -327,10 +323,10 @@ class LoginScreen(BaseScreen):
                 elif user[3] == 'admin':
                     self.app.push_screen(AdminDashboard(user))
             else:
-                 subtitle = self.query_one("#screen-subtitle", Label)
-                 subtitle.update("Error: Invalid ID or Access Denied!")
-                 subtitle.remove_class("success")
-                 subtitle.add_class("error")
+                subtitle = self.query_one("#screen-subtitle", Label)
+                subtitle.update("Error: Invalid ID or Access Denied!")
+                subtitle.remove_class("success")
+                subtitle.add_class("error")
 
 
 class AddCourseScreen(BaseScreen):
@@ -362,6 +358,7 @@ class AddCourseScreen(BaseScreen):
                 else:
                     self.notify("Error: Code already exists.", severity="error")
 
+
 class RosterScreen(BaseScreen):
     # Screen for viewing global roster.
     def compose_content(self) -> ComposeResult:
@@ -384,6 +381,7 @@ class RosterScreen(BaseScreen):
         super().on_button_pressed(event)
         if event.button.id == "back":
             self.app.pop_screen()
+
 
 class RegisterAdminScreen(BaseScreen):
     # Screen for registering new admins.
@@ -411,6 +409,7 @@ class RegisterAdminScreen(BaseScreen):
                 self.app.pop_screen()
             else:
                 self.notify("Error: Already exists.", severity="error")
+
 
 class AdminDashboard(BaseScreen):
     # Dashboard for admins.
@@ -458,6 +457,7 @@ class WelcomePage(BaseScreen):
             self.app.push_screen(RegistrationScreen())
         elif event.button.id == "current_user":
             self.app.push_screen(LoginScreen())
+
 
 class StudentManagerApp(App):
 

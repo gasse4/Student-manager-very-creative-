@@ -16,6 +16,10 @@ class UniversityDB:
     def _init_db(self):
         """Initialize database schema with tables for users, courses, and enrollments."""
         self.cursor.execute("PRAGMA foreign_keys = ON")
+        # self.cursor.execute("PRAGMA journal_mode = WAL")
+        # self.cursor.execute("PRAGMA synchronous = NORMAL")
+        # self.cursor.execute("PRAGMA cache_size = -64000")  # 64MB cache
+        # self.cursor.execute("PRAGMA temp_store = MEMORY")
         
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS users (
             u_uuid TEXT PRIMARY KEY,
