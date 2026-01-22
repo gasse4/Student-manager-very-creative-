@@ -1,5 +1,4 @@
 import sqlite3
-import os
 
 DB_NAME = "student_manager.db"
 
