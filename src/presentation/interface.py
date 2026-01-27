@@ -22,7 +22,7 @@ def student_portal(user_repo, course_repo, enrollment_repo):
         
         elif choice == '2':
             name = input("Enter Student Full Name: ").strip()
-            custom_id = bytes(uuid.uuid4())[:8].upper()
+            custom_id = str(uuid.uuid4())[:8].upper()
             result = user_repo.register_user(name, 'student', custom_id)
             if result:
                 input(f"\n[+] Success! Your Custom ID is: {custom_id}\nPress Enter...")
